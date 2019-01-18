@@ -50,6 +50,10 @@ class Control extends EventEmitter {
         return this;
       }
 
+      // 장치 접속 관리자에게 접속 요청
+      this.deviceController.doConnect();
+
+      // Connect 결과 이벤트가 발생할때까지 대기
       await eventToPromise.multi(this, [CONNECT], [DISCONNECT]);
 
       return this;
@@ -103,10 +107,66 @@ class Control extends EventEmitter {
     }
   }
 
+  /**
+   * 장치로 명령 전송
+   * @param {*} msg 보낼 명령
+   */
+  async writeMsg(msg) {
+    // BU.CLI('writeMsg', msg);
+    await this.deviceController.write(msg);
+  }
+
+  disconnect() {
+    this.deviceController.disconnect();
+  }
+
   /** 경사 일사량 센서로 데이터를 요청하는 명령 발송 */
   inquiryDevice() {
     // BU.CLI('inquiryDevice');
-    this.deviceController.write(this.config.incliendSolarInfo);
+    // this.deviceController.write('@state');
+    // setTimeout(() => {
+    //   BU.CLI('@@@@@@@@@ ON');
+    //   this.deviceController.write('@on');
+    // }, 1000);
+    // setTimeout(() => {
+    //   this.deviceController.write('@state');
+    // }, 2000);
+    // setTimeout(() => {
+    //   BU.CLI('@@@@@@@@@ OFF');
+    //   this.deviceController.write('@off');
+    // }, 3000);
+    // setTimeout(() => {
+    //   this.deviceController.write('@state');
+    // }, 4000);
+    // this.deviceController.write(
+    //   Buffer.concat([Buffer.from(':SOUR:INP:STAT?'), Buffer.from([0x0a])]),
+    // );
+    // this.deviceController.write(
+    //   Buffer.concat([Buffer.from(':SOUR:INP:STAT ON'), Buffer.from([0x0a])]),
+    // );
+    // this.deviceController.write(Buffer.from('3a4d4541537572653a564f4c546167653f0a', 'hex'));
+    // this.deviceController.write(
+    //   Buffer.concat([Buffer.from(':SOUR:FUNC RES'), Buffer.from([0x0a])]),
+    // );
+    // this.deviceController.write(
+    //   Buffer.concat([Buffer.from(':SOUR:RES:LEV:IMM 2'), Buffer.from([0x0d, 0x0a])]),
+    // );
+    // this.deviceController.write(
+    //   Buffer.concat([Buffer.from(':MEASure:VOLTage?'), Buffer.from([0x0d, 0x0a])]),
+    // );
+    // setTimeout(() => {
+    //   this.deviceController.write(Buffer.from(':MEASure:CURRent?\n'));
+    // }, 11);
+    // setTimeout(() => {
+    //   this.deviceController.write(Buffer.from(':MEASure:CURRent?\n'));
+    // }, 111);
+    // setTimeout(() => {
+    //   this.deviceController.write(Buffer.from('323120676574207274640d', 'hex'));
+    // }, 111);
+    // setTimeout(() => {
+    //   this.deviceController.write(Buffer.from('21 get rtd\r'));
+    // }, 222);
+    // this.deviceController.write(this.config.incliendSolarInfo);
   }
 
   /**
@@ -135,7 +195,7 @@ class Control extends EventEmitter {
    * @param {buffer} bufData 현재 장비에서 실행되고 있는 명령 객체
    */
   onData(bufData) {
-    BU.CLI(bufData);
+    BU.CLI(bufData.toString());
     // const resultData = this.model.onData(bufData);
 
     // BU.CLI(this.getDeviceOperationInfo().data);
