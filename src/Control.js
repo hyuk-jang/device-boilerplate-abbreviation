@@ -1,14 +1,16 @@
 const _ = require('lodash');
+const fs = require('fs');
 const eventToPromise = require('event-to-promise');
 const EventEmitter = require('events');
 
 const { BU } = require('base-util-jh');
 
+const AbstController = require('device-client-controller-jh');
 const Model = require('./Model');
 
 const mainConfig = require('./config');
 
-const AbstController = require('../../device-client-controller-jh');
+// const AbstController = require('../../device-client-controller-jh');
 
 require('../../default-intelligence');
 
@@ -17,6 +19,9 @@ class Control extends EventEmitter {
   constructor(config = mainConfig) {
     super();
     this.config = config;
+
+    // const productionPath = process.env.DEV_MODE === 'dev' ? `${process.cwd()}/config.js`;
+
     this.deviceInfo = this.config.deviceInfo;
 
     this.setInterval = null;
@@ -35,8 +40,24 @@ class Control extends EventEmitter {
   /**
    */
   async init() {
+    BU.CLI('init');
+    if (process.env.DEV_MODE !== 'dev') {
+      const realOption = await fs.readFileSync(`${process.cwd()}/config.json`);
+      if (BU.IsJsonString(realOption.toString())) {
+        const json = JSON.parse(realOption.toString());
+        this.config.deviceInfo.connect_info.port = json.comPort;
+        this.config.dbInfo.database = json.database;
+        this.config.dbInfo.host = json.host;
+        this.config.dbInfo.user = json.user;
+        this.config.dbInfo.password = json.password;
+      }
+    }
+
     // 모델 선언
     this.model = new Model(this);
+
+    await this.model.init();
+
     try {
       const abstController = new AbstController();
       this.definedControlEvent = abstController.definedControlEvent;
@@ -69,18 +90,26 @@ class Control extends EventEmitter {
   }
 
   /**
-   * 장치의 현재 데이터 및 에러 내역을 가져옴
-   * @return {{id: string, config: Object, data: {}, systemErrorList: Array, troubleList: Array}}
+   * 주기적으로 명령을 실행하고자 할 경우
    */
-  getDeviceOperationInfo() {
-    return {
-      id: this.config.deviceInfo.target_id,
-      config: this.config.deviceInfo,
-      data: this.model.deviceData,
-      // systemErrorList: [{code: 'new Code22223', msg: '에러 테스트 메시지22', occur_date: new Date() }],
-      systemErrorList: this.systemErrorList,
-      troubleList: [],
-    };
+  runScheduler() {
+    BU.CLI('runScheduler');
+    try {
+      if (this.setInterval !== null) {
+        // BU.CLI('Stop')
+        clearInterval(this.setInterval);
+      }
+
+      // 1분마다 데이터 DB 저장
+      this.setInterval = setInterval(() => {
+        this.model.insertDB();
+        this.model.initDeviceData();
+      }, 1000 * 60);
+
+      return true;
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**
@@ -120,55 +149,6 @@ class Control extends EventEmitter {
     this.deviceController.disconnect();
   }
 
-  /** 경사 일사량 센서로 데이터를 요청하는 명령 발송 */
-  inquiryDevice() {
-    // BU.CLI('inquiryDevice');
-    // this.deviceController.write('@state');
-    // setTimeout(() => {
-    //   BU.CLI('@@@@@@@@@ ON');
-    //   this.deviceController.write('@on');
-    // }, 1000);
-    // setTimeout(() => {
-    //   this.deviceController.write('@state');
-    // }, 2000);
-    // setTimeout(() => {
-    //   BU.CLI('@@@@@@@@@ OFF');
-    //   this.deviceController.write('@off');
-    // }, 3000);
-    // setTimeout(() => {
-    //   this.deviceController.write('@state');
-    // }, 4000);
-    // this.deviceController.write(
-    //   Buffer.concat([Buffer.from(':SOUR:INP:STAT?'), Buffer.from([0x0a])]),
-    // );
-    // this.deviceController.write(
-    //   Buffer.concat([Buffer.from(':SOUR:INP:STAT ON'), Buffer.from([0x0a])]),
-    // );
-    // this.deviceController.write(Buffer.from('3a4d4541537572653a564f4c546167653f0a', 'hex'));
-    // this.deviceController.write(
-    //   Buffer.concat([Buffer.from(':SOUR:FUNC RES'), Buffer.from([0x0a])]),
-    // );
-    // this.deviceController.write(
-    //   Buffer.concat([Buffer.from(':SOUR:RES:LEV:IMM 2'), Buffer.from([0x0d, 0x0a])]),
-    // );
-    // this.deviceController.write(
-    //   Buffer.concat([Buffer.from(':MEASure:VOLTage?'), Buffer.from([0x0d, 0x0a])]),
-    // );
-    // setTimeout(() => {
-    //   this.deviceController.write(Buffer.from(':MEASure:CURRent?\n'));
-    // }, 11);
-    // setTimeout(() => {
-    //   this.deviceController.write(Buffer.from(':MEASure:CURRent?\n'));
-    // }, 111);
-    // setTimeout(() => {
-    //   this.deviceController.write(Buffer.from('323120676574207274640d', 'hex'));
-    // }, 111);
-    // setTimeout(() => {
-    //   this.deviceController.write(Buffer.from('21 get rtd\r'));
-    // }, 222);
-    // this.deviceController.write(this.config.incliendSolarInfo);
-  }
-
   /**
    * Device Controller에서 새로운 이벤트가 발생되었을 경우 알림
    * @param {string} eventName 'dcConnect' 연결, 'dcClose' 닫힘, 'dcError' 에러
@@ -195,10 +175,8 @@ class Control extends EventEmitter {
    * @param {buffer} bufData 현재 장비에서 실행되고 있는 명령 객체
    */
   onData(bufData) {
-    BU.CLI(bufData.toString());
-    // const resultData = this.model.onData(bufData);
-
-    // BU.CLI(this.getDeviceOperationInfo().data);
+    // console.log(bufData);
+    this.model.onData(bufData);
   }
 }
 module.exports = Control;

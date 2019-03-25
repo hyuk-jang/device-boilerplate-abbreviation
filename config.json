@@ -1,0 +1,7 @@
+{
+  "comPort": "COM1",
+  "database": "solar",
+  "host": "localhost",
+  "user": "root",
+  "password": "smsoftware"
+}

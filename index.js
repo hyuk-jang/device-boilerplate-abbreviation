@@ -6,10 +6,14 @@ module.exports = Control;
 if (require !== undefined && require.main === module) {
   console.log('__main__');
 
+  process.env.NODE_ENV = 'production';
+
+  require('dotenv').config();
+
   const controller = new Control();
 
   controller.init().then(() => {
-    controller.inquiryDevice();
+    controller.runScheduler();
   });
 
   process.on('uncaughtException', err => {
