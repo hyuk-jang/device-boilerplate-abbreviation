@@ -105,7 +105,10 @@ class Model {
     // 일사량 객체를 찾는다면
     if (solarRow) {
       const solarId = solarRow.solar_id;
-      this.averageStorage.addData([solarId], solar);
+      this.averageStorage.addData(
+        [solarId],
+        _.eq(solarId, 'S_C') ? _.multiply(solar, 0.65) : solar,
+      );
 
       _.set(this.deviceData, [solarId], this.averageStorage.getAverage(solarId));
     }
