@@ -37,6 +37,9 @@ class Control extends EventEmitter {
   async init() {
     // 모델 선언
     this.model = new Model(this);
+
+    await this.model.init();
+
     try {
       const abstController = new AbstController();
       this.definedControlEvent = abstController.definedControlEvent;
@@ -65,6 +68,29 @@ class Control extends EventEmitter {
       }
       // Controller 반환
       return this;
+    }
+  }
+
+  /**
+   * 주기적으로 명령을 실행하고자 할 경우
+   */
+  runScheduler() {
+    BU.CLI('runScheduler');
+    try {
+      if (this.setInterval !== null) {
+        // BU.CLI('Stop')
+        clearInterval(this.setInterval);
+      }
+
+      // 1분마다 데이터 DB 저장
+      this.setInterval = setInterval(() => {
+        this.model.insertDB();
+        this.model.initDeviceData();
+      }, 1000 * 60);
+
+      return true;
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -196,9 +222,7 @@ class Control extends EventEmitter {
    */
   onData(bufData) {
     BU.CLI(bufData.toString());
-    // const resultData = this.model.onData(bufData);
-
-    // BU.CLI(this.getDeviceOperationInfo().data);
+    this.model.onData(bufData);
   }
 }
 module.exports = Control;
