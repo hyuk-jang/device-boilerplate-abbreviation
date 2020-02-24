@@ -3,14 +3,11 @@ const eventToPromise = require('event-to-promise');
 const EventEmitter = require('events');
 
 const { BU } = require('base-util-jh');
+const AbstController = require('device-client-controller-jh');
+require('default-intelligence');
 
 const Model = require('./Model');
-
 const mainConfig = require('./config');
-
-const AbstController = require('../../device-client-controller-jh');
-
-require('../../default-intelligence');
 
 class Control extends EventEmitter {
   /** @param {mainConfig} config */
@@ -42,6 +39,10 @@ class Control extends EventEmitter {
 
     try {
       const abstController = new AbstController();
+
+      const serialList = await abstController.getSerialList();
+      BU.CLI(serialList);
+
       this.definedControlEvent = abstController.definedControlEvent;
       const { CONNECT, DISCONNECT } = this.definedControlEvent;
 
@@ -76,22 +77,18 @@ class Control extends EventEmitter {
    */
   runScheduler() {
     BU.CLI('runScheduler');
-    try {
-      if (this.setInterval !== null) {
-        // BU.CLI('Stop')
-        clearInterval(this.setInterval);
-      }
-
-      // 1분마다 데이터 DB 저장
-      this.setInterval = setInterval(() => {
-        this.model.insertDB();
-        this.model.initDeviceData();
-      }, 1000 * 60);
-
-      return true;
-    } catch (error) {
-      throw error;
+    if (this.setInterval !== null) {
+      // BU.CLI('Stop')
+      clearInterval(this.setInterval);
     }
+
+    // 1분마다 데이터 DB 저장
+    this.setInterval = setInterval(() => {
+      this.model.insertDB();
+      this.model.initDeviceData();
+    }, 1000 * 60);
+
+    return true;
   }
 
   /**
@@ -114,23 +111,19 @@ class Control extends EventEmitter {
    */
   runDeviceInquiryScheduler() {
     BU.CLI('runDeviceInquiryScheduler');
-    try {
-      if (this.setInterval !== null) {
-        // BU.CLI('Stop')
-        clearInterval(this.setInterval);
-      }
-
-      // 3초 마다 데이터 수신 확인
-      this.setInterval = setInterval(() => {
-        this.inquiryDevice();
-      }, 3000);
-
-      this.inquiryDevice();
-
-      return true;
-    } catch (error) {
-      throw error;
+    if (this.setInterval !== null) {
+      // BU.CLI('Stop')
+      clearInterval(this.setInterval);
     }
+
+    // 3초 마다 데이터 수신 확인
+    this.setInterval = setInterval(() => {
+      this.inquiryDevice();
+    }, 3000);
+
+    this.inquiryDevice();
+
+    return true;
   }
 
   /**

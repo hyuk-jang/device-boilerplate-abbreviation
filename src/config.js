@@ -7,8 +7,8 @@ const mainConfig = {
     dataLength: 20,
   },
   deviceInfo: {
-    target_id: 'InclinedSolar',
-    target_name: '경사 일사량',
+    target_id: 'outboard_1',
+    target_name: '선외추락방지 1',
     target_category: 'weathercast',
     logOption: {
       hasCommanderResponse: true,
@@ -31,10 +31,10 @@ const mainConfig = {
       hasReconnect: true,
     },
     connect_info: {
-      type: 'modbus',
-      subType: 'rtu',
-      baudRate: 9600,
-      port: 'COM3',
+      type: 'serial',
+      // subType: 'readLine',
+      baudRate: 115200,
+      port: '/dev/ttyAMA0',
     },
     // connect_info: {
     //   type: 'serial',

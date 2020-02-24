@@ -30,16 +30,14 @@ class Model {
    * 모델 정의
    */
   async setModel() {
-    this.biModule = new BM(this.config.dbInfo);
-
-    /** @type {CONNECTOR[]} */
-    this.connectorRows = await this.biModule.getTable('connetor');
-
-    // 장치 데이터 세팅
-    this.connectorRows.forEach(solarRow => {
-      solarRow.remote_addr = Buffer.from(solarRow.remote_addr, 'hex').toString();
-      _.set(this.deviceData, [solarRow.solar_id], null);
-    });
+    // this.biModule = new BM(this.config.dbInfo);
+    // /** @type {CONNECTOR[]} */
+    // this.connectorRows = await this.biModule.getTable('connetor');
+    // // 장치 데이터 세팅
+    // this.connectorRows.forEach(solarRow => {
+    //   solarRow.remote_addr = Buffer.from(solarRow.remote_addr, 'hex').toString();
+    //   _.set(this.deviceData, [solarRow.solar_id], null);
+    // });
   }
 
   /** 평균 값 산출 저장소 데이터 초기화 */
