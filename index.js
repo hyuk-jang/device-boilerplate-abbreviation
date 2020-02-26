@@ -1,16 +1,17 @@
-const Control = require('./src/Control');
+const router = require('./src/router');
 
-module.exports = Control;
+module.exports = router;
 
 // if __main process
 if (require !== undefined && require.main === module) {
   console.log('__main__');
 
-  const controller = new Control();
+  const config = require('./src/config');
+  // console.log(config.deviceInfo);
 
-  controller.init().then(() => {
-    controller.inquiryDevice();
-  });
+  const controller = router.getControl(config);
+
+  controller.init();
 
   process.on('uncaughtException', err => {
     // BU.debugConsole();

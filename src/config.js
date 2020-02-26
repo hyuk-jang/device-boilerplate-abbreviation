@@ -1,10 +1,32 @@
-/** @type {dataLoggerConfig} */
+require('dotenv').config();
+
+const ENV = process.env;
+
+const { controllerParserType } = require('default-intelligence').dccFlagModel;
+
+/** @type {projectConfig} */
 const mainConfig = {
-  incliendSolarInfo: {
-    fnCode: 4,
-    unitId: 1,
-    address: 0,
-    dataLength: 20,
+  projectInfo: {
+    projectMainId: ENV.PJ_MAIN_ID || 'ZGB_BAT',
+    projectSubId: ENV.PJ_SUB_ID || '',
+    featureConfig: {
+      apiConfig: {
+        type: 'socket',
+        host: ENV.PJ_HTTP_HOST,
+        port: ENV.PJ_API_PORT,
+        addConfigInfo: {
+          parser: controllerParserType.socket.DELIMITER,
+          option: '\u0004',
+        },
+      },
+    },
+  },
+  dbInfo: {
+    port: ENV.PJ_DB_PORT || '3306',
+    host: ENV.PJ_DB_HOST || 'localhost',
+    user: ENV.PJ_DB_USER || 'root',
+    password: ENV.PJ_DB_PW || 'test',
+    database: ENV.PJ_DB_DB || 'test',
   },
   deviceInfo: {
     target_id: 'outboard_1',
@@ -18,23 +40,27 @@ const mainConfig = {
       hasDcMessage: true,
       hasTransferCommand: true,
     },
-    protocol_info: {
-      mainCategory: 'weathercast',
-      subCategory: 'vantagepro2',
-      protocolOptionInfo: {
-        hasTrackingData: false,
-      },
-    },
+    // protocol_info: {
+    //   mainCategory: 'weathercast',
+    //   subCategory: 'vantagepro2',
+    //   protocolOptionInfo: {
+    //     hasTrackingData: false,
+    //   },
+    // },
     controlInfo: {
       hasErrorHandling: false,
       hasOneAndOne: false,
       hasReconnect: true,
     },
     connect_info: {
-      type: 'serial',
-      // subType: 'readLine',
-      baudRate: 115200,
-      port: '/dev/ttyAMA0',
+      type: ENV.CONN_TYPE,
+      subType: ENV.CONN_SUBTYPE,
+      baudRate: ENV.CONN_BR,
+      port: ENV.CONN_PORT,
+      addConfigInfo: {
+        parser: ENV.CONN_CONFIG_PARSER,
+        option: ENV.CONN_CONFIG_OPTION,
+      },
     },
     // connect_info: {
     //   type: 'serial',
