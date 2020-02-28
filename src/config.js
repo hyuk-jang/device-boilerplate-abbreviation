@@ -59,7 +59,7 @@ const mainConfig = {
       port: ENV.CONN_PORT,
       addConfigInfo: {
         parser: ENV.CONN_CONFIG_PARSER,
-        option: ENV.CONN_CONFIG_OPTION,
+        option: ENV.CONN_CONFIG_DELIMITER_HX,
       },
     },
     // connect_info: {

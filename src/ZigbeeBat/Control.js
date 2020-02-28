@@ -105,7 +105,7 @@ class Control extends EventEmitter {
    * @param {buffer} bufData 현재 장비에서 실행되고 있는 명령 객체
    */
   onData(bufData) {
-    BU.CLI(bufData.toString());
+    BU.log(bufData.toString());
     this.model.onData(bufData);
   }
 }

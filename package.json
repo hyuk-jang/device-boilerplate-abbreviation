@@ -6,10 +6,21 @@
   "directories": {
     "test": "test"
   },
+  "bin": {
+    "app": "./index.js"
+  },
+  "pkg": {
+    "assets": []
+  },
   "scripts": {
     "test": "node_modules/.bin/mocha -w",
     "start": "nodemon --trace-warnings index.js",
-    "generate-docs": "node_modules/.bin/jsdoc -c jsdoc.json"
+    "generate-docs": "node_modules/.bin/jsdoc -c jsdoc.json",
+    "build": "pkg . --out-path dist",
+    "build:win": "pkg . --out-path dist --targets node8-win-x64",
+    "build:linux": "pkg . --out-path dist --targets node8-linux-x64",
+    "build:armv7": "pkg . --out-path dist --targets node8-linux-armv7",
+    "build:macos": "pkg . --out-path dist --targets node8-macos-x64"
   },
   "keywords": [],
   "author": "j.hyuk",
@@ -26,14 +37,14 @@
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.18.3",
     "jsdoc": "^3.6.3",
-    "mocha": "^7.0.1",
+    "mocha": "^7.1.0",
     "prettier": "^1.19.1"
   },
   "dependencies": {
     "base-model-jh": "^1.2.9",
     "base-util-jh": "^1.2.5",
     "default-intelligence": "^0.1.8",
-    "device-client-controller-jh": "^0.2.2",
+    "device-client-controller-jh": "^0.3.0",
     "event-to-promise": "^0.8.0",
     "lodash": "^4.17.15"
   }

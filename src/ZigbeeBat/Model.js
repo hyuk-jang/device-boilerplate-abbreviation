@@ -50,15 +50,15 @@ class Model {
    * @param {Buffer[]} bufData
    */
   onData(bufData) {
-    BU.log(bufData);
+    // BU.log(bufData);
     const zgbCntDataList = bufData.toString().split('_');
-    BU.CLI(zgbCntDataList);
+    // BU.CLI(zgbCntDataList);
 
     // 데이터 분석
     const countNumber = zgbCntDataList[0];
     const zigbeeAddr = zgbCntDataList[1];
 
-    BU.CLIS(countNumber, zigbeeAddr);
+    // BU.CLIS(countNumber, zigbeeAddr);
 
     // CNT로 시작하지 않을경우 무시
     if (!_.includes(countNumber, 'CNT')) return false;
@@ -74,7 +74,7 @@ class Model {
       recv_time: new Date(),
     };
 
-    // this.biModule.setTable('zgb_bat_data', insertInfo);
+    this.biModule.setTable('zgb_bat_data', insertInfo);
   }
 }
 
