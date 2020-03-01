@@ -83,6 +83,7 @@
  * @typedef {Object} V_BLE_SCAN_STATUS 종속성 오류를 극복하기 위해 임시 테이블을 생성합니다.
  * @property {string} alias 별명
  * @property {string} ble_addr 블루투스 주소
+ * @property {string} model_name 블루투스 모델 타입
  * @property {number} ble_scan_data_seq 블루투스 스캔 데이터 시퀀스
  * @property {number} ble_scan_seq 블루투스 스캔 시퀀스
  * @property {string} data_flag 데이터 플래그

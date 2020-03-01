@@ -6,14 +6,6 @@ const { BU, CU } = require('base-util-jh');
 
 class Model {
   /**
-   *
-   * @param {Control} controller
-   */
-  constructor(controller) {
-    this.deviceData = {};
-  }
-
-  /**
    * 저장소를 깨끗이 비우고 현재 값을 초기화 시킴
    * @param {dbInfo} dbInfo
    */
@@ -21,23 +13,9 @@ class Model {
     this.biModule = new BM(dbInfo);
 
     /** @type {ZGB_BAT[]} */
-    this.zgbBatRows = await this.biModule.getTable('zgb_bat', null, true);
+    this.zgbBatRows = await this.biModule.getTable('zgb_bat', null, false);
 
     this.zigbeeAddrList = _.map(this.zgbBatRows, 'ieee_addr');
-  }
-
-  /**
-   * 모델 정의
-   */
-  async setModel() {
-    // this.biModule = new BM(this.config.dbInfo);
-    // /** @type {CONNECTOR[]} */
-    // this.connectorRows = await this.biModule.getTable('connetor');
-    // // 장치 데이터 세팅
-    // this.connectorRows.forEach(solarRow => {
-    //   solarRow.remote_addr = Buffer.from(solarRow.remote_addr, 'hex').toString();
-    //   _.set(this.deviceData, [solarRow.solar_id], null);
-    // });
   }
 
   /** 평균 값 산출 저장소 데이터 초기화 */
