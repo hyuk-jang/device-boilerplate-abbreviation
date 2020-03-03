@@ -7,6 +7,7 @@ if (require !== undefined && require.main === module) {
   console.log('__main__');
 
   const config = require('./src/config');
+  console.log(config);
   // console.log(config.deviceInfo);
 
   const controller = router.getControl(config);

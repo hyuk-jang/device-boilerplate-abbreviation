@@ -18,19 +18,11 @@ class Control extends EventEmitter {
     this.setInterval = null;
 
     // 스캔 인터벌
-    this.scanIntervalSec = Number(process.env.BLE_SCAN_INTERVAL_SEC);
-    this.scanDurationSec = Number(process.env.BLE_SCAN_DURATION_SEC);
+    this.scanIntervalSec = Number(process.env.BLE_SCAN_INTERVAL_SEC || 60);
+    this.scanDurationSec = Number(process.env.BLE_SCAN_DURATION_SEC || 3);
 
-    this.startScanCmd = 'at+reqscan1';
-    this.endScanCmd = 'at+reqscan0';
-  }
-
-  /**
-   * 컨트롤러 ID를 가져올 경우
-   * @return {string} Device Controller를 대표하는 ID
-   */
-  get id() {
-    return this.deviceInfo.target_id;
+    this.startScanCmd = 'at+reqscan1\r';
+    this.endScanCmd = 'at+reqscan0\r';
   }
 
   /**
@@ -43,9 +35,6 @@ class Control extends EventEmitter {
 
     try {
       const abstController = new AbstController();
-
-      const serialList = await abstController.getSerialList();
-      BU.CLI(serialList);
 
       this.definedControlEvent = abstController.definedControlEvent;
       const { CONNECT, DISCONNECT } = this.definedControlEvent;
@@ -82,7 +71,7 @@ class Control extends EventEmitter {
    * 주기적으로 명령을 실행하고자 할 경우
    */
   runScheduler() {
-    BU.CLI('runScheduler');
+    console.log('runScheduler');
     if (this.setInterval !== null) {
       // BU.CLI('Stop')
       clearInterval(this.setInterval);
@@ -90,8 +79,7 @@ class Control extends EventEmitter {
 
     // Scan Interval
     this.setInterval = setInterval(() => {
-      this.model.insertDB();
-      this.model.initDeviceData();
+      this.inquiryDevice();
     }, 1000 * this.scanIntervalSec);
 
     return true;
@@ -102,25 +90,21 @@ class Control extends EventEmitter {
    * @param {*} msg 보낼 명령
    */
   async writeMsg(msg) {
-    // BU.CLI('writeMsg', msg);
+    console.log('writeMsg', msg);
     await this.deviceController.write(msg);
   }
 
   /** 주기적으로 요청할 로직 */
   inquiryDevice() {
+    // BU.CLI('inquiryDevice', this.startScanCmd);
     this.writeMsg(this.startScanCmd);
 
     // 스캔 종료
     setTimeout(() => {
       this.writeMsg(this.endScanCmd);
-
       // DB에 데이터 삽입
       this.model.insertDB();
     }, 1000 * this.scanDurationSec);
-  }
-
-  disconnect() {
-    this.deviceController.disconnect();
   }
 
   /**
@@ -128,15 +112,22 @@ class Control extends EventEmitter {
    * @param {string} eventName 'dcConnect' 연결, 'dcClose' 닫힘, 'dcError' 에러
    */
   onEvent(eventName) {
-    BU.CLI(eventName);
+    // BU.CLI(eventName);
     const { CONNECT, DISCONNECT } = this.definedControlEvent;
 
     switch (eventName) {
       case CONNECT:
         this.emit(CONNECT);
+        // 즉시 스캔 명령 요청
+        this.inquiryDevice();
+        // Scan 스케줄러 동작
+        this.runScheduler();
         break;
       case DISCONNECT:
         this.emit(DISCONNECT);
+        // Scan 스케줄러 종료
+        this.setInterval !== null && clearInterval(this.setInterval);
+        this.model.insertDB();
         break;
       default:
         break;

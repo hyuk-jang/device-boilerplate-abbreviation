@@ -14,6 +14,7 @@ class Model {
 
     /** @type {BLE_SCAN[]} */
     this.bleScanRows = await this.biModule.getTable('ble_scan', null, false);
+    // BU.CLI(this.bleScanRows);
 
     this.bleAddrList = _.map(this.bleScanRows, 'ble_addr');
 
@@ -29,7 +30,7 @@ class Model {
     // BU.log(bufData);
 
     const bleScanDataList = bufData.toString().split(',');
-
+    // BU.CLI(_.head(bleScanDataList));
     const bleScanRow = _.find(this.bleScanRows, { ble_addr: _.head(bleScanDataList) });
 
     // 목록에 없을 경우
@@ -54,7 +55,7 @@ class Model {
    * @param {BLE_SCAN} bleScanRow
    */
   on770Parser(bleScanDataList, bleScanRow) {
-    // BU.CLI(bleScanDataList);
+    // BU.CLI('on770Parser', bleScanDataList);
     const { ble_scan_seq: bleScanSeq } = bleScanRow;
     // 저장소의 마지막 bleAddr 명을 가진 객체 추출
     /** @type {BLE_SCAN_DATA} */
@@ -68,10 +69,20 @@ class Model {
       // 저장소의 객체가 완전할 경우  row 빈 객체 생성,
       dataStorage = {
         ble_scan_seq: bleScanSeq,
+        adc0: null,
+        adc1: null,
+        bat_v: null,
+        data_flag: null,
+        gpio: null,
+        recv_time: new Date(),
+        rssi: null,
+        temp: null,
+        tx_power: null,
       };
       isNewFlag = true;
     }
 
+    // BU.CLI(dataStorage);
     const secondData = _.nth(bleScanDataList, 1);
     const thirdData = _.nth(bleScanDataList, 2);
     const fourthData = _.nth(bleScanDataList, 3);
@@ -126,9 +137,21 @@ class Model {
    * @param {BLE_SCAN} bleScanRow
    */
   on780Parser(bleScanDataList, bleScanRow) {
+    // BU.CLI('on780Parser', bleScanDataList);
     const { ble_scan_seq: bleScanSeq } = bleScanRow;
     /** @type {BLE_SCAN_DATA} */
-    const dataStorage = { ble_scan_seq: bleScanSeq };
+    const dataStorage = {
+      ble_scan_seq: bleScanSeq,
+      adc0: null,
+      adc1: null,
+      bat_v: null,
+      data_flag: null,
+      gpio: null,
+      recv_time: new Date(),
+      rssi: null,
+      temp: null,
+      tx_power: null,
+    };
 
     const thirdData = _.nth(bleScanDataList, 2);
     const fourthData = _.nth(bleScanDataList, 3);
@@ -160,11 +183,16 @@ class Model {
 
   /** 데이터 DB 입력 */
   async insertDB() {
+    // 입력할 데이터가 없다면 종료
+    if (this.dataStorageList.length > 0) return false;
+
     const insetDataList = this.dataStorageList;
     this.dataStorageList = [];
     // DB 데이터 반영
 
-    await this.biModule.setTables('ble_scan_data', insetDataList);
+    // BU.CLI(insetDataList);
+
+    await this.biModule.setTables('ble_scan_data', insetDataList, false);
   }
 }
 
@@ -187,15 +215,15 @@ if (require !== undefined && require.main === module) {
     },
   ];
 
-  model.onData('C4BE84E43383,020104,04FF010203,0200BB');
-  BU.CLI(model.dataStorageList);
-  model.onData('C4BE84E43383,Marine_FBL770_T01,020A00,0200BB');
-  BU.CLI(model.dataStorageList);
+  // model.onData('C4BE84E43383,020104,04FF010203,0200BB');
+  // BU.CLI(model.dataStorageList);
+  // model.onData('C4BE84E43383,Marine_FBL770_T01,020A00,0200BB');
+  // BU.CLI(model.dataStorageList);
 
-  model.onData('C4BE84E43383,020106,04FF010203,0200BB');
-  BU.CLI(model.dataStorageList);
-  model.onData('C4BE84E43383,Marine_FBL770_T01,020A11,0200CC');
-  BU.CLI(model.dataStorageList);
+  // model.onData('C4BE84E43383,020106,04FF010203,0200BB');
+  // BU.CLI(model.dataStorageList);
+  // model.onData('C4BE84E43383,Marine_FBL770_T01,020A11,0200CC');
+  // BU.CLI(model.dataStorageList);
 
   // model.onData('00190148D001,Marine_780_T01,020104,020A02,08FFFF17150D140018,0200A9');
   // BU.CLI(model.dataStorageList);

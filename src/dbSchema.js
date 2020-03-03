@@ -50,7 +50,6 @@
  * @typedef {Object} BLE_SCAN_DATA  블루투스 스캔 데이터
  * @property {number} ble_scan_data_seq 블루투스 스캔 데이터 시퀀스
  * @property {number} ble_scan_seq 블루투스 스캔 시퀀스
- * @property {string} model_name 770 or 780
  * @property {string} data_flag 데이터 플래그
  * @property {number} tx_power Tx Power
  * @property {string} gpio GPIO
