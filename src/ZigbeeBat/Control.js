@@ -16,8 +16,6 @@ class Control extends EventEmitter {
     this.deviceInfo = this.config.deviceInfo;
 
     this.setInterval = null;
-
-    // BU.CLI(this.config);
   }
 
   /**
@@ -39,15 +37,10 @@ class Control extends EventEmitter {
     try {
       const abstController = new AbstController();
 
-      const serialList = await abstController.getSerialList();
-      BU.CLI(serialList);
-
       this.definedControlEvent = abstController.definedControlEvent;
       const { CONNECT, DISCONNECT } = this.definedControlEvent;
 
       this.deviceController = abstController.setDeviceController(this.config.deviceInfo);
-
-      // console.dir(this.deviceController);
 
       this.deviceController.attach(this);
 
@@ -84,7 +77,6 @@ class Control extends EventEmitter {
    * @param {string} eventName 'dcConnect' 연결, 'dcClose' 닫힘, 'dcError' 에러
    */
   onEvent(eventName) {
-    BU.CLI(eventName);
     const { CONNECT, DISCONNECT } = this.definedControlEvent;
 
     switch (eventName) {
@@ -105,7 +97,7 @@ class Control extends EventEmitter {
    * @param {buffer} bufData 현재 장비에서 실행되고 있는 명령 객체
    */
   onData(bufData) {
-    BU.log(bufData.toString());
+    console.log(bufData.toString());
     this.model.onData(bufData);
   }
 }

@@ -23,6 +23,9 @@ class Control extends EventEmitter {
 
     this.startScanCmd = 'at+reqscan1\r';
     this.endScanCmd = 'at+reqscan0\r';
+
+    this.currentScanCmd = '';
+    this.retryChance = 5;
   }
 
   /**
@@ -56,8 +59,6 @@ class Control extends EventEmitter {
 
       return this;
     } catch (error) {
-      // BU.error(error);
-
       // 초기화에 실패할 경우에는 에러 처리
       if (error instanceof ReferenceError) {
         throw error;
@@ -91,16 +92,21 @@ class Control extends EventEmitter {
    */
   async writeMsg(msg) {
     console.log('writeMsg', msg);
+    // 현재 수행 중인 명령 입력
+    this.currentScanCmd = msg;
+
     await this.deviceController.write(msg);
   }
 
   /** 주기적으로 요청할 로직 */
   inquiryDevice() {
     // BU.CLI('inquiryDevice', this.startScanCmd);
+    this.retryChance = 5;
     this.writeMsg(this.startScanCmd);
 
     // 스캔 종료
     setTimeout(() => {
+      this.retryChance = 5;
       this.writeMsg(this.endScanCmd);
       // DB에 데이터 삽입
       this.model.insertDB();
@@ -140,6 +146,17 @@ class Control extends EventEmitter {
    * @param {buffer} bufData 현재 장비에서 실행되고 있는 명령 객체
    */
   onData(bufData) {
+    // 에러 메시지를 수신받았고 현재 수행중인 명령이 있고 재시도 횟수가 존재할 경우
+    if (bufData === 'ERROR' && this.currentScanCmd.length && this.retryChance > 0) {
+      this.retryChance -= 1;
+      return this.writeMsg(this.currentScanCmd);
+    }
+    // 전송메시지가 성공했을 경우
+    if (bufData === 'OK') {
+      this.retryChance = 5;
+      this.currentScanCmd = '';
+    }
+
     console.log(bufData.toString());
     // BU.log(bufData.toString());
     this.model.onData(bufData);

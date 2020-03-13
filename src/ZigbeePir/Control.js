@@ -37,9 +37,6 @@ class Control extends EventEmitter {
     try {
       const abstController = new AbstController();
 
-      const serialList = await abstController.getSerialList();
-      BU.CLI(serialList);
-
       this.definedControlEvent = abstController.definedControlEvent;
       const { CONNECT, DISCONNECT } = this.definedControlEvent;
 
@@ -60,8 +57,6 @@ class Control extends EventEmitter {
 
       return this;
     } catch (error) {
-      // BU.error(error);
-
       // 초기화에 실패할 경우에는 에러 처리
       if (error instanceof ReferenceError) {
         throw error;
@@ -80,7 +75,7 @@ class Control extends EventEmitter {
    * @param {string} eventName 'dcConnect' 연결, 'dcClose' 닫힘, 'dcError' 에러
    */
   onEvent(eventName) {
-    BU.CLI(eventName);
+    // BU.CLI(eventName);
     const { CONNECT, DISCONNECT } = this.definedControlEvent;
 
     switch (eventName) {

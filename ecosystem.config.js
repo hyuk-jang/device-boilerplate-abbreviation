@@ -26,7 +26,7 @@ module.exports = {
         CONN_BR: 115200,
         CONN_PORT: '/dev/ttyAMA0',
         CONN_CONFIG_PARSER: 'delimiterParser',
-        CONN_CONFIG_DELIMITER_HX: '0d0a0a',
+        CONN_CONFIG_DELIMITER_HX: '0d0a',
       },
       env_production: {
         NODE_ENV: 'production',
@@ -58,7 +58,7 @@ module.exports = {
         CONN_BR: 115200,
         CONN_PORT: '/dev/ttyAMA0',
         CONN_CONFIG_PARSER: 'delimiterParser',
-        CONN_CONFIG_DELIMITER_HX: '0d0a0a',
+        CONN_CONFIG_DELIMITER_HX: '0d0a',
       },
       env_production: {
         NODE_ENV: 'production',

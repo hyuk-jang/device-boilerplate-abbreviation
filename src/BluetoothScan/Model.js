@@ -184,7 +184,7 @@ class Model {
   /** 데이터 DB 입력 */
   async insertDB() {
     // 입력할 데이터가 없다면 종료
-    if (this.dataStorageList.length > 0) return false;
+    if (this.dataStorageList.length === 0) return false;
 
     const insetDataList = this.dataStorageList;
     this.dataStorageList = [];
