@@ -52,7 +52,11 @@ class Model {
   onData(inclinedSolar) {
     if (inclinedSolar.length) {
       if (_.isNumber(_.head(inclinedSolar))) {
-        this.averageStorage.addData('inclinedSolar', _.round(_.head(inclinedSolar) * 0.1), 1);
+        this.averageStorage.addData(
+          'inclinedSolar',
+          _.round(_.head(inclinedSolar) * 0.1),
+          1,
+        );
       }
     } else {
       // 에러나면 평균 값 인덱스 1개 제거

@@ -3,7 +3,8 @@ const eventToPromise = require('event-to-promise');
 const EventEmitter = require('events');
 
 const { BU } = require('base-util-jh');
-const AbstController = require('device-client-controller-jh');
+// const AbstController = require('device-client-controller-jh');
+const AbstController = require('../../device-client-controller-jh');
 require('default-intelligence');
 
 const Model = require('./Model');
